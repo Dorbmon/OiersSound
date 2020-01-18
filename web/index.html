@@ -169,7 +169,7 @@
         var username = document.getElementById("username").value;
         xmlhttp.send("content="+Base64.encode(content) + "&username="+username);
     }
-    function AddTag (num,name,content,time) {
+    function AddTag (num,name,rcontent,time) {
         var content=document.getElementById("content");
         var newTip=document.createElement("div");
         //给每个小纸片添加类名
@@ -178,12 +178,12 @@
         newTip.id="tip"+time;
         //给每个纸片添加内容
         newTip.innerHTML='<div class="tip_h" title="双击关闭纸条">\n' +
-            '            <div class="num">第[' + num +']条 '+time+'</div>\n' +
+            '            <div class="num">第' + num +'条</div>\n' +
             '            <div class="close" title="关闭纸条" >×</div>\n' +
             '            <div class="clr"></div>\n' +
             '        </div>\n' +
             '        <div class="tip_c">\n' +
-            '            '+content+'\n' +
+            '            '+rcontent+'\n' +
             '        </div>\n' +
             '        <div class="tip_f">\n' +
             '            <div class="icon">\n' +
@@ -219,8 +219,12 @@
             if (xmlhttp.readyState==4 && xmlhttp.status==200) {
                 //var res = eval(xmlhttp.responseText)["contents"];
                 var res = JSON.parse(xmlhttp.responseText)["contents"];
+                //console.log (res);
                 for (var item in res) {
-                    AddTag (item['num'],item['name'],Base64.decode(item['content']),item['time']);
+                    //alert (item['content']);
+                    console.log (Base64.decode(res[item]['content']));
+                    AddTag (res[item]['num'],res[item]['name'],Base64.decode(res[item]['content']),res[item]['time']);
+                    //AddTag (res[item]['num'],res[item]['name'],"res",res[item]['time']);
                 }
             }
         };

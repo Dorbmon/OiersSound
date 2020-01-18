@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Oiers Speak!</title>
+    <!-- 新 Bootstrap 核心 CSS 文件 -->
+<link href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+ 
+<!-- jQuery文件。务必在bootstrap.min.js 之前引入 -->
+<script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+ 
+<!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
+<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <style>
+
+        body {
+            margin: 0 auto;
+            padding: 0px;
+            font-size: 12px;
+            text-align: center;
+            background-color: pink;
+        }
+        #content {
+            margin: 0 auto;
+            width: 960px;
+            height: 627px;
+            position: relative;
+        }
+ 
+        #content .tip1 {
+            position: absolute;
+            width: 227px;
+            left: 200px;
+            top: 100px;
+        }
+ 
+        #content .tip1 .tip_h {
+            background: url(back.jpg);
+        }
+ 
+        #content .tip1 .tip_h, #content .tip2 .tip_h, #content .tip3 .tip_h, #content .tip4 .tip_h, #content .tip5 .tip_h, #content .tip6 .tip_h, #content .tip7 .tip_h, #content .tip8 .tip_h {
+            width: 227px;
+            padding-top: 45px;
+            height: 23px;
+            text-align: left;
+            cursor: move;
+        }
+        #content .tip1 .tip_c {
+            background:plum;
+        }
+ 
+        #content .tip1 .tip_c, #content .tip2 .tip_c, #content .tip3 .tip_c, #content .tip4 .tip_c, #content .tip5 .tip_c, #content .tip6 .tip_c, #content .tip7 .tip_c, #content .tip8 .tip_c {
+            width: 200px;
+            padding-left: 12px;
+            padding-right: 15px;
+            min-height: 40px;
+            text-align: left;
+            line-height: 20px;
+            max-height: 160px;
+            word-wrap: break-word;
+            word-break: break-all;
+            overflow: hidden;
+        }
+ 
+        #content .tip1 .tip_f {
+            background:url(back.jpg)
+        }
+ 
+        #content .tip1 .tip_f, #content .tip2 .tip_f, #content .tip3 .tip_f, #content .tip4 .tip_f, #content .tip5 .tip_f, #content .tip6 .tip_f, #content .tip7 .tip_f, #content .tip8 .tip_f {
+            width: 227px;
+            height: 53px;
+            padding-top: 20px;
+        }
+        #content .close, #content .close2 {
+            float: left;
+            font-size: 12px;
+            cursor: pointer;
+            color: #000000;
+        }
+        .clr {
+            clear: both;
+            overflow: auto;
+            display: block;
+            height: 0px;
+        }
+        #content .icon {
+            float: left;
+            width: 35px;
+            padding-left: 15px;
+            height: 35px;
+            text-align: center;
+        }
+        #content .name {
+            float: right;
+            padding-right: 15px;
+            text-align: right;
+            font-size: 14px;
+            line-height: 35px;
+            color: black;
+        }
+        #content .num {
+            float: left;
+            padding-left: 7px;
+            width: 195px;
+        }
+    </style>
+</head>
+<body>
+<div id="content">
+</div>
+<!-- 模态框（Modal） -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+					&times;
+				</button>
+				<h4 class="modal-title" id="myModalLabel">
+					发表你的言论
+				</h4>
+			</div>
+			<div class="modal-body">
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text">标题</span>
+                    </div>
+                    <input type="text" class="form-control" id = "title" placeholder="标题">
+                </div>
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text">名称</span>
+                    </div>
+                    <input type="text" class="form-control" id = "username" placeholder="名称">
+                </div>
+                <br>
+				<textarea id="content"></textarea>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">关闭
+				</button>
+				<button type="button" class="btn btn-primary" onclick="SubMit();">
+					提交更改
+				</button>
+			</div>
+		</div><!-- /.modal-content -->
+	</div><!-- /.modal -->
+</div>
+<button type="button" class="btn btn-primary" onclick="ShowWindow()">发表我的</button>
+<script>
+    //部分代码借鉴于https://blog.csdn.net/ramosTears123/article/details/89039869
+    var z=0;
+    function SubMit () {
+        var xmlhttp;
+        if (window.XMLHttpRequest){
+            xmlhttp=new XMLHttpRequest();
+        }else {
+            xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+        }
+        xmlhttp.onreadystatechange=function(){
+            if (xmlhttp.readyState==4 && xmlhttp.status==200) {
+                var res = eval(xmlhttp.responseText);
+                for (var item in res) {
+                    AddTag (item['num'],item['name'],self.atob(item['content']),item['time']);
+                }
+            }
+        };
+        xmlhttp.open("POST","",true);
+        xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+        xmlhttp.send("");
+    }
+    function AddTag (num,name,content,time) {
+        var content=document.getElementById("content");
+        var newTip=document.createElement("div");
+        //给每个小纸片添加类名
+        newTip.className="tip1";
+        //给每个小纸片添加id
+        newTip.id="tip"+time;
+        //给每个纸片添加内容
+        newTip.innerHTML='<div class="tip_h" title="双击关闭纸条">\n' +
+            '            <div class="num">第[' + num +']条 '+time+'</div>\n' +
+            '            <div class="close" title="关闭纸条" >×</div>\n' +
+            '            <div class="clr"></div>\n' +
+            '        </div>\n' +
+            '        <div class="tip_c">\n' +
+            '            '+content+'\n' +
+            '        </div>\n' +
+            '        <div class="tip_f">\n' +
+            '            <div class="icon">\n' +
+            '                <img src="image/bpic_1.gif" alt="" title="">\n' +
+            '            </div>\n' +
+            '            <div class="name">'+name+'</div>\n' +
+            '            <div class="clr"></div>\n' +
+            '        </div>';
+        //计算出10张纸片随机出现的范围
+        var maxLeft=960-227;//约等于700
+        var maxTop=627-200;//约等于400
+        //用Math对象获取获取该范围值
+        var ranLeft=parseInt(Math.random()*701);
+        var ranTop=parseInt(Math.random()*401);
+        //给纸片设置该范围值
+        newTip.style.left=ranLeft+"px";
+        newTip.style.top=ranTop+"px";
+        //将纸片拼接到页面上
+        content.appendChild(newTip);
+        //实现点击下面的纸片后覆盖到最上层,利用每次点击该纸片z-index都会+1,可实现后点击的永远比先点击的z-index大
+        newTip.onclick=function(){
+            this.style.zIndex=++z;
+        };
+    }
+    function Init () {
+        var xmlhttp;
+        if (window.XMLHttpRequest){
+            xmlhttp=new XMLHttpRequest();
+        }else {
+            xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+        }
+        xmlhttp.onreadystatechange=function(){
+            if (xmlhttp.readyState==4 && xmlhttp.status==200) {
+                var res = eval(xmlhttp.responseText);
+                for (var item in res) {
+                    AddTag (item['num'],item['name'],self.atob(item['content']),item['time']);
+                }
+            }
+        };
+        xmlhttp.open("POST","",true);
+        xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+        xmlhttp.send("");
+    }
+    //动态创建每个小纸条
+    //给纸片头部的关闭×添加点击关闭事件
+    var tip_hArr=document.getElementsByClassName("tip_h");
+    for(var i=0;i<tip_hArr.length;i++){
+        tip_hArr[i].ondblclick=function(){
+            content.removeChild(this.parentNode);
+        };
+    }
+    //给纸片头部添加双击关闭事件
+    var closeArr=document.getElementsByClassName("close");
+    for(var i=0;i<closeArr.length;i++){
+        closeArr[i].onclick=function(){
+            content.removeChild(this.parentNode.parentNode);
+        };
+    }
+    Init ();
+</script>
+ 
+</body>
+</html>

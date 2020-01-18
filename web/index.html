@@ -107,6 +107,7 @@
 </head>
 <body>
 <h1>-OH计划？我们有话说！</h1>
+<h1>请各位oier等巨佬不要发表无意义言论，谢谢！</h1>
 <div id="content">
 </div>
 
@@ -128,9 +129,10 @@
                       <span class="input-group-text">名称</span>
                     </div>
                     <input type="text" class="form-control" id = "username" placeholder="名称">
+                    <textarea id="rcontent" rows="10" cols="50"></textarea>
                 </div>
                 <br>
-				<textarea id="rcontent" rows="5" cols="10"></textarea>
+				
 			</div>
 			<div class="modal-footer">
 				<button type="button" class="btn btn-default" data-dismiss="modal">关闭
@@ -149,7 +151,7 @@
     //部分代码借鉴于https://blog.csdn.net/ramosTears123/article/details/89039869
     var z=0;
     function jump () {
-        window.location.href="http://59.110.230.92:1234/ShowAll.html";
+        window.location.href="http://www.oier.site/ShowAll.html";
     }
     function SubMit () {
         var xmlhttp;
@@ -167,6 +169,14 @@
         xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
         var content = document.getElementById("rcontent").value;
         var username = document.getElementById("username").value;
+        if (content == "") {
+            alert ("请输入内容！")
+            return;
+        }
+        if (username == "") {
+            alert ("请输入你的名称!")
+            return;
+        }
         xmlhttp.send("content="+Base64.encode(content) + "&username="+username);
     }
     function AddTag (num,name,rcontent,time) {
@@ -249,6 +259,6 @@
     }
     Init ();
 </script>
- 
+<footer>基于开源项目<a href="https://github.com/Dorbmon/OiersSound">OiersSound</a></footer>
 </body>
 </html>

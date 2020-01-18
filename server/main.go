@@ -27,6 +27,9 @@ const MXCNT=1
 var fmutex sync.RWMutex
 var fileCh = make(chan revdata,1000000)
 func rev(res http.ResponseWriter,req *http.Request){
+	res.Header().Set("Access-Control-Allow-Origin","*")
+	res.Header().Add("Access-Control-Allow-Headers","Content-Type")
+	res.Header().Set("content-type","text/plain")
 	defer req.Body.Close()
 	var val=req.PostFormValue("content")
 	var username=req.PostFormValue("username")
@@ -35,6 +38,9 @@ func rev(res http.ResponseWriter,req *http.Request){
 	res.Write([]byte("ok"))
 }
 func send(res http.ResponseWriter,req *http.Request){
+	res.Header().Set("Access-Control-Allow-Origin","*")
+	res.Header().Add("Access-Control-Allow-Headers","Content-Type")
+	res.Header().Set("content-type","text/plain")
 	defer req.Body.Close()
 	res.WriteHeader(200)
 	if bs,err:=ioutil.ReadFile("save.json");err==nil{

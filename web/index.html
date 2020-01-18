@@ -125,12 +125,6 @@
 			<div class="modal-body">
                 <div class="input-group mb-3">
                     <div class="input-group-prepend">
-                      <span class="input-group-text">标题</span>
-                    </div>
-                    <input type="text" class="form-control" id = "title" placeholder="标题">
-                </div>
-                <div class="input-group mb-3">
-                    <div class="input-group-prepend">
                       <span class="input-group-text">名称</span>
                     </div>
                     <input type="text" class="form-control" id = "username" placeholder="名称">
@@ -170,9 +164,9 @@
         };
         xmlhttp.open("POST","59.110.230.92:1234/Submit",true);
         xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
-        var content = document.getElementById("content").value,title = document.getElementById("title").value;
+        var content = document.getElementById("content").value;
         var username = document.getElementById("username").value;
-        xmlhttp.send("content="+self.btoa(content) + "&username="+username+"&title="+title);
+        xmlhttp.send("content="+self.btoa(content) + "&username="+username);
     }
     function AddTag (num,name,content,time) {
         var content=document.getElementById("content");

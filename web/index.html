@@ -134,7 +134,7 @@
                     <input type="text" class="form-control" id = "username" placeholder="名称">
                 </div>
                 <br>
-				<textarea id="content"></textarea>
+				<textarea id="content" rows="5" cols="10"></textarea>
 			</div>
 			<div class="modal-footer">
 				<button type="button" class="btn btn-default" data-dismiss="modal">关闭
@@ -146,7 +146,7 @@
 		</div><!-- /.modal-content -->
 	</div><!-- /.modal -->
 </div>
-<button type="button" class="btn btn-primary" onclick="ShowWindow()">发表我的</button>
+<button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal">发表我的</button>
 <script>
     //部分代码借鉴于https://blog.csdn.net/ramosTears123/article/details/89039869
     var z=0;
@@ -159,15 +159,14 @@
         }
         xmlhttp.onreadystatechange=function(){
             if (xmlhttp.readyState==4 && xmlhttp.status==200) {
-                var res = eval(xmlhttp.responseText);
-                for (var item in res) {
-                    AddTag (item['num'],item['name'],self.atob(item['content']),item['time']);
-                }
+                alert ("发送成功，请刷新页面。");
             }
         };
-        xmlhttp.open("POST","",true);
+        xmlhttp.open("POST","59.110.230.92:1234/Submit",true);
         xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
-        xmlhttp.send("");
+        var content = document.getElementById("content").value,title = document.getElementById("title").value;
+        var username = document.getElementById("username").value;
+        xmlhttp.send("content="+self.btoa(content) + "&username="+username+"&title="+title);
     }
     function AddTag (num,name,content,time) {
         var content=document.getElementById("content");
@@ -223,7 +222,7 @@
                 }
             }
         };
-        xmlhttp.open("POST","",true);
+        xmlhttp.open("POST","59.110.230.92:1234/GetData",true);
         xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
         xmlhttp.send("");
     }

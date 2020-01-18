@@ -143,13 +143,13 @@
 	</div><!-- /.modal -->
 </div>
 <button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal">发表我的</button>
-<button class="btn btn-primary btn-lg" online="jump()">查看当前的所有</button>
+<button class="btn btn-primary btn-lg" onclick="jump()">查看当前的所有</button>
 <script src="base64.min.js"></script>
 <script>
     //部分代码借鉴于https://blog.csdn.net/ramosTears123/article/details/89039869
     var z=0;
     function jump () {
-        window.location.href="http://oier.site/ShowAll.html";
+        window.location.href="http://59.110.230.92:1234/ShowAll.html";
     }
     function SubMit () {
         var xmlhttp;
@@ -163,7 +163,7 @@
                 alert ("发送成功，请刷新页面。");
             }
         };
-        xmlhttp.open("POST","http://127.0.0.1:1234/Submit",true);
+        xmlhttp.open("POST","http://59.110.230.92:1234/Submit",true);
         xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
         var content = document.getElementById("rcontent").value;
         var username = document.getElementById("username").value;
@@ -228,7 +228,7 @@
                 }
             }
         };
-        xmlhttp.open("POST","http://127.0.0.1:1234/GetData",true);
+        xmlhttp.open("POST","http://59.110.230.92:1234/GetData",true);
         xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
         xmlhttp.send("");
     }

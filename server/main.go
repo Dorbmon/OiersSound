@@ -101,5 +101,5 @@ func main(){
 	http.HandleFunc("/GetData",send)
 	go writeFile()
 	fmt.Println("run run")
-	http.ListenAndServe(":1234",nil)
+	http.ListenAndServe("0.0.0.0:1234",nil)
 }

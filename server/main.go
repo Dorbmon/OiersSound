@@ -7,13 +7,14 @@ import (
 	"net/http"
 	"os"
 	"runtime"
+	"sync"
 	"time"
 )
 type data struct {
-		Name string `json:"name"`
-		Content string `json:"content"`
-		Time string `json:"time"`
-		Num int `json:"num"`
+	Name string `json:"name"`
+	Content string `json:"content"`
+	Time string `json:"time"`
+	Num int `json:"num"`
 }
 type revdata struct {
 	Name string
@@ -22,12 +23,10 @@ type revdata struct {
 type filecontent struct {
 	Contents []data `json:"contents"`
 }
-const MXCNT=2000
+const MXCNT=1
+var fmutex sync.RWMutex
 var fileCh = make(chan revdata,1000000)
 func rev(res http.ResponseWriter,req *http.Request){
-	res.Header().Set("Access-Control-Allow-Origin","*")
-	res.Header().Add("Access-Control-Allow-Headers","Content-Type")
-	res.Header().Set("content-type","text/plain")
 	defer req.Body.Close()
 	var val=req.PostFormValue("content")
 	var username=req.PostFormValue("username")
@@ -36,14 +35,13 @@ func rev(res http.ResponseWriter,req *http.Request){
 	res.Write([]byte("ok"))
 }
 func send(res http.ResponseWriter,req *http.Request){
-	res.Header().Set("Access-Control-Allow-Origin","*")
-	res.Header().Add("Access-Control-Allow-Headers","Content-Type")
-	res.Header().Set("content-type","text/plain")
 	defer req.Body.Close()
 	res.WriteHeader(200)
 	if bs,err:=ioutil.ReadFile("save.json");err==nil{
 		var tmpfilecontent=filecontent{}
 		if merr:=json.Unmarshal(bs,&tmpfilecontent);merr==nil{
+			fmutex.RLock()
+			defer fmutex.RUnlock()
 			tmpfilecontent.Contents=append(tmpfilecontent.Contents,fcont.Contents...)
 			if writedata,writeerr:=json.Marshal(tmpfilecontent);writeerr==nil{
 				res.Write(writedata)
@@ -59,6 +57,7 @@ func writeFile(){
 	var gidx=1
 	for{
 		if sval,ok:=<-fileCh;ok{
+			fmutex.Lock()
 			var tdata=data{}
 			tdata.Num=gidx
 			gidx++
@@ -68,23 +67,25 @@ func writeFile(){
 			fcont.Contents=append(fcont.Contents,tdata)
 			cnt++
 			if cnt>=MXCNT{
-					if fdata,ferr:=ioutil.ReadFile("save.json");ferr==nil{
-						var tmpfilecontent=filecontent{}
-						if merr:=json.Unmarshal(fdata,&tmpfilecontent);merr==nil{
-							tmpfilecontent.Contents=append(tmpfilecontent.Contents, fcont.Contents...)
-							if writedata,writeerr:=json.Marshal(tmpfilecontent);writeerr==nil{
-								os.Remove("save.json")
-								ioutil.WriteFile("save.json",writedata,os.ModeAppend)
-							}
-						}else{
-							fmt.Println("no no no")
+				if fdata,ferr:=ioutil.ReadFile("save.json");ferr==nil{
+					var tmpfilecontent=filecontent{}
+					if merr:=json.Unmarshal(fdata,&tmpfilecontent);merr==nil{
+						tmpfilecontent.Contents=append(tmpfilecontent.Contents, fcont.Contents...)
+						if writedata,writeerr:=json.Marshal(tmpfilecontent);writeerr==nil{
+							os.Remove("save.json")
+							ioutil.WriteFile("save.json",writedata,os.ModeAppend)
 						}
 					}else{
 						fmt.Println("no no no")
 					}
+				}else{
+					fmt.Println("no no no")
+				}
 				fcont.Contents=nil
 				cnt=0
+
 			}
+			fmutex.Unlock()
 		}
 	}
 }
@@ -93,6 +94,6 @@ func main(){
 	http.HandleFunc("/Submit",rev)
 	http.HandleFunc("/GetData",send)
 	go writeFile()
-	fmt.Println ("run")
+	fmt.Println("run run")
 	http.ListenAndServe(":1234",nil)
 }

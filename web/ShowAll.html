@@ -14,6 +14,7 @@
 
 </body>
 </html>
+<script src="base64.min.js"></script>
 <script>
 //开始初始化
 var Str = `
@@ -41,7 +42,7 @@ if (xmlhttp.readyState==4 && xmlhttp.status==200) {
         Str += `
             <tr>
             <td>` + String(item['num']) + `</td>
-            <td>` + self.atob(item['content']) + `</td>
+            <td>` + Base64.decode(item['content']) + `</td>
             <td>` + item["name"] + `</td>
             <td>` + item["time"] +`</td>
             </tr>

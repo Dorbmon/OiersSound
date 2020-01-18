@@ -106,8 +106,10 @@
     </style>
 </head>
 <body>
+<h1>-OH计划？我们有话说！</h1>
 <div id="content">
 </div>
+
 <!-- 模态框（Modal） -->
 <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
 	<div class="modal-dialog">
@@ -147,9 +149,13 @@
 	</div><!-- /.modal -->
 </div>
 <button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal">发表我的</button>
+<button class="btn btn-primary btn-lg" online="jump()">查看当前的所有</button>
 <script>
     //部分代码借鉴于https://blog.csdn.net/ramosTears123/article/details/89039869
     var z=0;
+    function jump () {
+        window.location.href="http://oier.site/ShowAll.html";
+    }
     function SubMit () {
         var xmlhttp;
         if (window.XMLHttpRequest){
@@ -216,7 +222,7 @@
         }
         xmlhttp.onreadystatechange=function(){
             if (xmlhttp.readyState==4 && xmlhttp.status==200) {
-                var res = eval(xmlhttp.responseText);
+                var res = eval(xmlhttp.responseText)["contents"];
                 for (var item in res) {
                     AddTag (item['num'],item['name'],self.atob(item['content']),item['time']);
                 }

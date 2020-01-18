@@ -27,6 +27,7 @@ const MXCNT=1
 var fmutex sync.RWMutex
 var fileCh = make(chan revdata,1000000)
 func rev(res http.ResponseWriter,req *http.Request){
+	fmt.Println ("get")
 	res.Header().Set("Access-Control-Allow-Origin","*")
 	res.Header().Add("Access-Control-Allow-Headers","Content-Type")
 	res.Header().Set("content-type","text/plain")
@@ -38,6 +39,7 @@ func rev(res http.ResponseWriter,req *http.Request){
 	res.Write([]byte("ok"))
 }
 func send(res http.ResponseWriter,req *http.Request){
+	fmt.Println ("get")
 	res.Header().Set("Access-Control-Allow-Origin","*")
 	res.Header().Add("Access-Control-Allow-Headers","Content-Type")
 	res.Header().Set("content-type","text/plain")

@@ -162,7 +162,7 @@
                 alert ("发送成功，请刷新页面。");
             }
         };
-        xmlhttp.open("POST","59.110.230.92:1234/Submit",true);
+        xmlhttp.open("POST","http://127.0.0.1:1234/Submit",true);
         xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
         var content = document.getElementById("content").value;
         var username = document.getElementById("username").value;
@@ -222,7 +222,7 @@
                 }
             }
         };
-        xmlhttp.open("POST","59.110.230.92:1234/GetData",true);
+        xmlhttp.open("POST","http://127.0.0.1:1234/GetData",true);
         xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
         xmlhttp.send("");
     }

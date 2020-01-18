@@ -25,6 +25,9 @@ type filecontent struct {
 const MXCNT=2000
 var fileCh = make(chan revdata,1000000)
 func rev(res http.ResponseWriter,req *http.Request){
+	res.Header().Set("Access-Control-Allow-Origin","*")
+	res.Header().Add("Access-Control-Allow-Headers","Content-Type")
+	res.Header().Set("content-type","text/plain")
 	defer req.Body.Close()
 	var val=req.PostFormValue("content")
 	var username=req.PostFormValue("username")
@@ -33,6 +36,9 @@ func rev(res http.ResponseWriter,req *http.Request){
 	res.Write([]byte("ok"))
 }
 func send(res http.ResponseWriter,req *http.Request){
+	res.Header().Set("Access-Control-Allow-Origin","*")
+	res.Header().Add("Access-Control-Allow-Headers","Content-Type")
+	res.Header().Set("content-type","text/plain")
 	defer req.Body.Close()
 	res.WriteHeader(200)
 	if bs,err:=ioutil.ReadFile("save.json");err==nil{
@@ -85,7 +91,8 @@ func writeFile(){
 func main(){
 	runtime.GOMAXPROCS(runtime.NumCPU())
 	http.HandleFunc("/Submit",rev)
-	http.HandleFunc("GetData",send)
+	http.HandleFunc("/GetData",send)
 	go writeFile()
+	fmt.Println ("run")
 	http.ListenAndServe(":1234",nil)
 }

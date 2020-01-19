@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"compress/gzip"
+	"math"
 	"net/http"
 	"os"
 	"runtime"
@@ -78,7 +79,20 @@ func send(res http.ResponseWriter,req *http.Request){
 var fcont filecontent
 func writeFile(){
 	var cnt = 0
-	var gidx=1
+	var gidx int
+	if bs,err:=ioutil.ReadFile("save.json");err==nil{
+		var filecontents=filecontent{}
+		if merr:=json.Unmarshal(bs,&filecontents);merr==nil{
+			var L=len(filecontents.Contents)
+			for  i:=0;i<L;i++{
+				gidx=int(math.Max(float64(gidx),float64(filecontents.Contents[i].Num)))
+			}
+		}else{
+			fmt.Println(merr)
+		}
+	}else{
+		fmt.Println(err)
+	}
 	for{
 		if sval,ok:=<-fileCh;ok{
 			fmutex.Lock()

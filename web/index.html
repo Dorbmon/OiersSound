@@ -149,6 +149,7 @@
 </div>
 
 <script src="base64.min.js"></script>
+<script src="pako.min.js"></script>
 <script>
     //部分代码借鉴于https://blog.csdn.net/ramosTears123/article/details/89039869
     var z=0;
@@ -164,11 +165,12 @@
         }
         xmlhttp.onreadystatechange=function(){
             if (xmlhttp.readyState==4 && xmlhttp.status==200) {
-                alert ("发送成功，请刷新页面。");
+                alert (xmlhttp.responseText);
                 $('#myModal').modal('hide');
             }
         };
         xmlhttp.open("POST","http://59.110.230.92:1234/Submit",true);
+        //xmlhttp.open("POST","http://127.0.0.1:1234/Submit",true);
         xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
         var content = document.getElementById("rcontent").value;
         var username = document.getElementById("username").value;
@@ -217,12 +219,35 @@
         newTip.style.top=ranTop+"px";
         //将纸片拼接到页面上
         content.appendChild(newTip);
+        rcontent = rcontent.substring (0,199);
         document.getElementById("tip"+num).textContent = rcontent;
         //实现点击下面的纸片后覆盖到最上层,利用每次点击该纸片z-index都会+1,可实现后点击的永远比先点击的z-index大
         newTip.onclick=function(){
             this.style.zIndex=++z;
         };
     }
+    function unzip(b64Data){
+  var strData   = atob(b64Data);
+  // Convert binary string to character-number array
+  var charData  = strData.split('').map(function(x){return x.charCodeAt(0);});
+  // Turn number array into byte-array
+  var binData   = new Uint8Array(charData);
+  // // unzip
+  var data    = pako.inflate(binData);
+  // Convert gunzipped byteArray back to ascii string:
+  // strData   = String.fromCharCode.apply(null, new Uint16Array(data));
+  array = new Uint16Array(data)
+  var res = '';
+  var chunk = 8 * 1024;
+  var i;
+  for (i = 0; i < array.length / chunk; i++) {
+     res += String.fromCharCode.apply(null, array.slice(i * chunk, (i + 1) * chunk)); 
+    }
+  res += String.fromCharCode.apply(null, array.slice(i * chunk));
+
+  strData = res
+  return strData;
+} 
     function Init () {
         var xmlhttp;
         if (window.XMLHttpRequest){
@@ -232,20 +257,27 @@
         }
         xmlhttp.onreadystatechange=function(){
             if (xmlhttp.readyState==4 && xmlhttp.status==200) {
-                //var res = eval(xmlhttp.responseText)["contents"];
-                var res = JSON.parse(xmlhttp.responseText)["contents"];
+                var res = unzip(xmlhttp.responseText);
+                var res = JSON.parse(res)["contents"];
                 //console.log (res);
                 for (var item in res) {
                     //alert (item['content']);
                     res[item]['content']=res[item]['content'].replace(/\s+/g,"+"); 
                     console.log (res[item]['content']);
-                    console.log (Base64.decode(res[item]['content']));
-                    AddTag (res[item]['num'],res[item]['name'],Base64.decode(res[item]['content']),res[item]['time']);
+                    var rcontent;
+                    try {
+                        rcontent = Base64.decode(res[item]['content']);
+                    } catch (e) {
+                        rcontent = "数据加载失败";
+                        return;
+                    }
+                    AddTag (res[item]['num'],res[item]['name'],rcontent,res[item]['time']);
                     //AddTag (res[item]['num'],res[item]['name'],"res",res[item]['time']);
                 }
             }
         };
         xmlhttp.open("POST","http://59.110.230.92:1234/GetData",true);
+        //xmlhttp.open("POST","http://127.0.0.1:1234/GetData",true);
         xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
         xmlhttp.send("");
     }

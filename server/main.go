@@ -4,11 +4,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"compress/gzip"
 	"net/http"
 	"os"
 	"runtime"
 	"sync"
 	"time"
+	"bytes"
+	"encoding/base64"
 )
 type data struct {
 	Name string `json:"name"`
@@ -26,8 +29,19 @@ type filecontent struct {
 const MXCNT=1
 var fmutex sync.RWMutex
 var fileCh = make(chan revdata,1000000)
+var IpLastVis map[string]time.Time
+const (
+	MaxTimeBetween = time.Minute
+)
 func rev(res http.ResponseWriter,req *http.Request){
-	fmt.Println ("get")
+	ip := req.RemoteAddr
+	if _,ok := IpLastVis [ip];ok {
+		if time.Now().Sub(IpLastVis[ip]) < MaxTimeBetween {
+			res.Write([]byte("操作过于频繁！请稍后再试"))
+			return
+		}
+	}
+	IpLastVis [ip] = time.Now()
 	res.Header().Set("Access-Control-Allow-Origin","*")
 	res.Header().Add("Access-Control-Allow-Headers","Content-Type")
 	res.Header().Set("content-type","text/plain")
@@ -36,10 +50,9 @@ func rev(res http.ResponseWriter,req *http.Request){
 	var username=req.PostFormValue("username")
 	fileCh<-revdata{username,val}
 	res.WriteHeader(200)
-	res.Write([]byte("ok"))
+	res.Write([]byte("成功！请刷新页面"))
 }
 func send(res http.ResponseWriter,req *http.Request){
-	fmt.Println ("get")
 	res.Header().Set("Access-Control-Allow-Origin","*")
 	res.Header().Add("Access-Control-Allow-Headers","Content-Type")
 	res.Header().Set("content-type","text/plain")
@@ -50,10 +63,13 @@ func send(res http.ResponseWriter,req *http.Request){
 		if merr:=json.Unmarshal(bs,&tmpfilecontent);merr==nil{
 			fmutex.RLock()
 			defer fmutex.RUnlock()
-			tmpfilecontent.Contents=append(tmpfilecontent.Contents,fcont.Contents...)
-			if writedata,writeerr:=json.Marshal(tmpfilecontent);writeerr==nil{
-				res.Write(writedata)
-			}
+			data,_ := ioutil.ReadFile("save.json")
+			var buff bytes.Buffer
+			gz := gzip.NewWriter(&buff)
+			gz.Write(data)
+			gz.Flush()
+			gz.Close()
+			res.Write([]byte(base64.StdEncoding.EncodeToString(buff.Bytes())))
 		}else{
 			fmt.Println("no no no")
 		}
@@ -99,6 +115,7 @@ func writeFile(){
 }
 func main(){
 	runtime.GOMAXPROCS(runtime.NumCPU())
+	IpLastVis = make (map[string]time.Time)
 	http.HandleFunc("/Submit",rev)
 	http.HandleFunc("/GetData",send)
 	go writeFile()

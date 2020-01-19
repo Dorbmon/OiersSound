@@ -12,14 +12,41 @@
 <script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
 </head>
 <body>
+<button class="btn btn-primary btn-lg" onclick="refresh()">刷新</button>
 <div id="content"></div>
 
 </body>
 </html>
 <script src="base64.min.js"></script>
+<script src="pako.min.js"></script>
 <script>
 //开始初始化
-var Str = `
+refresh ();
+function unzip(b64Data){
+  var strData   = atob(b64Data);
+  // Convert binary string to character-number array
+  var charData  = strData.split('').map(function(x){return x.charCodeAt(0);});
+  // Turn number array into byte-array
+  var binData   = new Uint8Array(charData);
+  // // unzip
+  var data    = pako.inflate(binData);
+  // Convert gunzipped byteArray back to ascii string:
+  // strData   = String.fromCharCode.apply(null, new Uint16Array(data));
+  array = new Uint16Array(data)
+  var res = '';
+  var chunk = 8 * 1024;
+  var i;
+  for (i = 0; i < array.length / chunk; i++) {
+     res += String.fromCharCode.apply(null, array.slice(i * chunk, (i + 1) * chunk)); 
+    }
+  res += String.fromCharCode.apply(null, array.slice(i * chunk));
+
+  strData = res
+  return strData;
+} 
+function refresh () {
+  document.getElementById("content").innerHTML = "";
+  var Str = `
 <table class="table">
   <caption>所有的数据</caption>
   <thead>
@@ -35,14 +62,14 @@ var xmlhttp;
 xmlhttp=new XMLHttpRequest();
 xmlhttp.onreadystatechange=function(){
 if (xmlhttp.readyState==4 && xmlhttp.status==200) {
-    var res = JSON.parse(xmlhttp.responseText)["contents"];
+  var ret = unzip(xmlhttp.responseText);
+    var res = JSON.parse(ret)["contents"];
     res = res.reverse ()
     for (var item in res) {
-      res[item]['content']=res[item]['content'].replace(/\s+/g,"+"); 
         Str += `
             <tr>
             <td>` + String(res[item]['num']) + `</td>
-            <td><div id="tip` + item + `"></td>
+            <td><div id="tip` + item + `">tmp</td>
             <td>` + res[item]["name"] + `</td>
             <td>` + res[item]["time"] +`</td>
             </tr>
@@ -51,13 +78,24 @@ if (xmlhttp.readyState==4 && xmlhttp.status==200) {
     Str += `</tbody></table>`;
     document.getElementById("content").innerHTML = Str;
     for (var item in res) {
-      document.getElementById("tip"+item).textContent = Base64.decode(res[item]['content']);
+      res[item]['content']=res[item]['content'].replace(/\s+/g,"+");
+      console.log (res[item]['content']);
+      var rcontent
+      try {
+        rcontent = Base64.decode(res[item]['content'])
+      } catch (e){
+        rcontent = "Base64解析失败。数据暂时无法显示";
+      }
+      
+      rcontent = rcontent.substring (0,Math.min(199,rcontent.length-1));
+      document.getElementById("tip"+String(item)).textContent = rcontent;
     }
 }
 };
 xmlhttp.open("POST","http://59.110.230.92:1234/GetData",true);
 xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
 xmlhttp.send("");
+}
 </script>
 <footer>
   基于开源项目<a href="https://github.com/Dorbmon/OiersSound">OiersSound</a></footer>

@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <script type="text/javascript" src="http://tajs.qq.com/stats?sId=66511888" charset="UTF-8"></script>
     <meta charset="UTF-8">
     <title>Oiers Speak!</title>
     <!-- 新 Bootstrap 核心 CSS 文件 -->
@@ -108,6 +109,8 @@
 <body>
 <h1>-OH计划？我们有话说！</h1>
 <h1>请各位oier等巨佬不要发表无意义言论，谢谢！</h1>
+<button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal">发表我的</button>
+<button class="btn btn-primary btn-lg" onclick="jump()">查看当前的所有</button>
 <div id="content">
 </div>
 
@@ -137,15 +140,14 @@
 			<div class="modal-footer">
 				<button type="button" class="btn btn-default" data-dismiss="modal">关闭
 				</button>
-				<button type="button" class="btn btn-primary" onclick="SubMit();">
+				<button type="button" class="btn btn-primary" onclick="SubMit();" data-dismiss="modal">
 					提交更改
 				</button>
 			</div>
 		</div><!-- /.modal-content -->
 	</div><!-- /.modal -->
 </div>
-<button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal">发表我的</button>
-<button class="btn btn-primary btn-lg" onclick="jump()">查看当前的所有</button>
+
 <script src="base64.min.js"></script>
 <script>
     //部分代码借鉴于https://blog.csdn.net/ramosTears123/article/details/89039869
@@ -163,6 +165,7 @@
         xmlhttp.onreadystatechange=function(){
             if (xmlhttp.readyState==4 && xmlhttp.status==200) {
                 alert ("发送成功，请刷新页面。");
+                $('#myModal').modal('hide');
             }
         };
         xmlhttp.open("POST","http://59.110.230.92:1234/Submit",true);
@@ -177,7 +180,8 @@
             alert ("请输入你的名称!")
             return;
         }
-        xmlhttp.send("content="+Base64.encode(content) + "&username="+username);
+        var tmp = Base64.encode(content).replace("+", "%2B");
+        xmlhttp.send("content="+ tmp + "&username="+username);
     }
     function AddTag (num,name,rcontent,time) {
         var content=document.getElementById("content");
@@ -192,8 +196,7 @@
             '            <div class="close" title="关闭纸条" >×</div>\n' +
             '            <div class="clr"></div>\n' +
             '        </div>\n' +
-            '        <div class="tip_c">\n' +
-            '            '+rcontent+'\n' +
+            '        <div class="tip_c" id="tip' + num +'">\n'+
             '        </div>\n' +
             '        <div class="tip_f">\n' +
             '            <div class="icon">\n' +
@@ -202,17 +205,19 @@
             '            <div class="name">'+name+'</div>\n' +
             '            <div class="clr"></div>\n' +
             '        </div>';
+        
         //计算出10张纸片随机出现的范围
         var maxLeft=960-227;//约等于700
         var maxTop=627-200;//约等于400
         //用Math对象获取获取该范围值
-        var ranLeft=parseInt(Math.random()*701);
-        var ranTop=parseInt(Math.random()*401);
+        var ranLeft=parseInt(Math.random()*2001);
+        var ranTop=parseInt(Math.random()*2001);
         //给纸片设置该范围值
         newTip.style.left=ranLeft+"px";
         newTip.style.top=ranTop+"px";
         //将纸片拼接到页面上
         content.appendChild(newTip);
+        document.getElementById("tip"+num).textContent = rcontent;
         //实现点击下面的纸片后覆盖到最上层,利用每次点击该纸片z-index都会+1,可实现后点击的永远比先点击的z-index大
         newTip.onclick=function(){
             this.style.zIndex=++z;
@@ -232,6 +237,8 @@
                 //console.log (res);
                 for (var item in res) {
                     //alert (item['content']);
+                    res[item]['content']=res[item]['content'].replace(/\s+/g,"+"); 
+                    console.log (res[item]['content']);
                     console.log (Base64.decode(res[item]['content']));
                     AddTag (res[item]['num'],res[item]['name'],Base64.decode(res[item]['content']),res[item]['time']);
                     //AddTag (res[item]['num'],res[item]['name'],"res",res[item]['time']);
@@ -259,6 +266,8 @@
     }
     Init ();
 </script>
-<footer>基于开源项目<a href="https://github.com/Dorbmon/OiersSound">OiersSound</a></footer>
+<footer >
+    基于开源项目<a href="https://github.com/Dorbmon/OiersSound">OiersSound</a></footer>
 </body>
 </html>
+    

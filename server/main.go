@@ -93,6 +93,7 @@ func writeFile(){
 	}else{
 		fmt.Println(err)
 	}
+	gidx++
 	for{
 		if sval,ok:=<-fileCh;ok{
 			fmutex.Lock()

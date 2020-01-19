@@ -108,7 +108,7 @@
 </head>
 <body>
 <h1>-OH计划？我们有话说！</h1>
-<h1>请各位oier等巨佬不要发表无意义言论，谢谢！</h1>
+<h2>请各位oier等巨佬不要发表无意义言论，谢谢！</h2>
 <button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal">发表我的</button>
 <button class="btn btn-primary btn-lg" onclick="jump()">查看当前的所有</button>
 <div id="content">
@@ -183,7 +183,7 @@
             return;
         }
         var tmp = Base64.encode(content).replace("+", "%2B");
-        xmlhttp.send("content="+ tmp + "&username="+username);
+        xmlhttp.send("content="+ tmp + "&username="+Base64.encode(username));
     }
     function AddTag (num,name,rcontent,time) {
         var content=document.getElementById("content");
@@ -202,7 +202,7 @@
             '        </div>\n' +
             '        <div class="tip_f">\n' +
             '            <div class="icon">\n' +
-            '                <img src="image/bpic_1.gif" alt="" title="">\n' +
+            '                <img src="" alt="" title="">\n' +
             '            </div>\n' +
             '            <div class="name">'+name+'</div>\n' +
             '            <div class="clr"></div>\n' +
@@ -263,7 +263,6 @@
                 for (var item in res) {
                     //alert (item['content']);
                     res[item]['content']=res[item]['content'].replace(/\s+/g,"+"); 
-                    console.log (res[item]['content']);
                     var rcontent;
                     try {
                         rcontent = Base64.decode(res[item]['content']);
@@ -271,7 +270,8 @@
                         rcontent = "数据加载失败";
                         return;
                     }
-                    AddTag (res[item]['num'],res[item]['name'],rcontent,res[item]['time']);
+                    console.log(res);
+                    AddTag (res[item]['num'],Base64.decode(res[item]['name']),rcontent,res[item]['time']);
                     //AddTag (res[item]['num'],res[item]['name'],"res",res[item]['time']);
                 }
             }
